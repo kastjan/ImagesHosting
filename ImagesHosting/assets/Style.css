@@ -1,0 +1,51 @@
+﻿#map {
+    width: auto;
+    height: 370px;
+}
+#cor {
+    padding-top: 10px;
+    padding-bottom : 20px;
+}
+
+.img-hover {
+    -webkit-transition: all .3s ease; /* Safari and Chrome */
+  	-moz-transition: all .3s ease; /* Firefox */
+  	-o-transition: all .3s ease; /* IE 9 */
+  	-ms-transition: all .3s ease; /* Opera */
+  	transition: all .3s ease;
+}
+.img-hover:hover{
+    -webkit-backface-visibility: hidden;
+    /*backface-visibility: hidden;*/
+    -webkit-transform: translateZ(0px) scale(1.7) translateX(150px); /* Safari and Chrome */
+    -moz-transform:scale(1.7); /* Firefox */
+    -ms-transform:scale(1.7); /* IE 9 */
+    -o-transform:translateX(150px) scale(1.7); /* Opera */
+    /*transform: translateZ(0px) translateX(200px) scale(1.7);*/
+    /*z-index: 3;*/
+    /*opacity : .99;*/
+}
+  
+  
+.grayscale {
+  -webkit-filter: brightness(1.10) grayscale(100%) contrast(90%);
+  -moz-filter: brightness(1.10) grayscale(100%) contrast(90%);
+  filter: brightness(1.10) grayscale(100%); 
+}
+.information {
+    z-index: 0;
+}
+
+.Exiftext{
+    max-height:330px;
+    overflow: auto;
+    position: relative; font-size:1em;
+
+}
+.allinfo {
+    max-height : 400px;
+}
+#googlemap {
+    padding-top: 20px;
+    padding-bottom: 10px;
+}

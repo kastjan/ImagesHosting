@@ -1,0 +1,93 @@
+﻿@model IEnumerable<int> 
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>MyTask</title>
+    <link rel="stylesheet" href="../assets/carousel.css">
+    <link rel="stylesheet" href="../assets/replacetext.css">
+    <link rel="stylesheet" href="../assets/Style.css">
+    <link rel="stylesheet" href="../assets/js/bootstrap-3.3.2-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../assets/js/bootstrap-3.3.2-dist/css/bootstrap-theme.min.css">
+    <script src="../assets/js/libs/jquery-1.11.3.min.js"></script>
+    <script src="../assets/js/scrollingcarousel.2.0.js"></script>
+    <script src="../assets/js/replacetext.js"></script>
+    <script src="../assets/js/pagescripts.js"></script>
+    <script src="../assets/js/libs/google.js"></script>
+    <script src="../assets/js/bootstrap-3.3.2-dist/js/bootstrap.min.js"></script>
+    
+
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+          <div class="col-lg-12 col-md-12">
+              <div class="row">
+                   <div class="col-lg-9 col-md-9">  
+                      @using(Html.BeginForm("UploadImage", "Upload", FormMethod.Post, new { enctype="multipart/form-data"}))
+                        {
+                            <div class="row">
+                                <div class="col-lg-9 col-md-9">
+                                    <input type="file" multiple="multiple" name="files" id="files" class="form-control" />
+                                </div>
+                                <div class="col-lg-3 col-md-3">
+                                    <input type="submit" value="Загрузить" class="form-control"  />
+                                </div>
+                            </div>
+                        }
+                       </div>
+                    <div class="col-lg-3 col-md-3">
+                        <input type="submit" value="Удалить" class="form-control"  onclick="removeimage()"/>
+                    </div>
+                </div>
+          </div>
+          <div id="cor" class="col-lg-12">
+              <div id="carouselka" class="carousel">
+	            <ul class="smallimage">
+		            @foreach(var item in Model)
+                    {
+                    <li>
+                            <img src="@Url.Action("viewimage", "Upload", new { id=item})"  width="130" height="100"  alt="image" onclick="get_data(this.src)"/>
+                    </li>
+                    }
+	            </ul>
+              </div>
+           </div>
+           <div class="col-lg-12 col-md-12 allinfo">
+              <div class="row">
+                    <div class="col-lg-5 col-md-5 allinfo ">
+                        <div id="viewimage" class="bigimage allinfo " ></div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 information allinfo">
+                        <h2 id="exifhead" style="display: none;">EXIF DATA</h2>
+                        <div id="viewinfo" data-spy="scroll" data-target="#navbar-example2"   data-offset="0" class="Exiftext"></div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 allinfo">
+                        <h2 id="userdescrhead" style="display: none;">COMMENTS</h2>
+                        <div id="userdescription"></div>
+                    </div>
+              </div>
+            </div>
+            <div id="googlemap" class="col-lg-12 col-md-12 ">
+                <div id="map" class="information" ></div>
+            </div>
+          
+        </div>
+    </div>
+
+
+    
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#carouselka').scrollingCarousel();
+    });
+</script>
+
+</body>
+</html>
