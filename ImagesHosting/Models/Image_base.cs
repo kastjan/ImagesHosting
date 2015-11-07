@@ -1,7 +1,4 @@
-﻿using System;
-using System.Web;
-
-namespace ImagesHosting.Models
+﻿namespace ImagesHosting.Models
 {
     public class Image_base 
     {
