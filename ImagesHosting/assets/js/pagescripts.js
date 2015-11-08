@@ -5,13 +5,14 @@
     id = parse[parse.length - 1];
     id = "/Upload/GetImageGPS/" + id;
     $.get(id, function (data) {
-        if (data) {
-            var p = data.split(" ");
-            var latitude = parseFloat(p[1]) + (parseFloat(p[2]) / 60) + (parseFloat(p[3]) / 3600);
-            if (p[0] == "S")
+        if (data[0].parameter) {
+            var p = data[1].data.split(" ");
+            var latitude = parseFloat(p[0]) + (parseFloat(p[1]) / 60) + (parseFloat(p[2]) / 3600);
+            if (data[0].data == "S")
                 latitude = -latitude;
-            var longitude = parseFloat(p[5]) + (parseFloat(p[6]) / 60) + (parseFloat(p[7]) / 3600);
-            if (p[4] == "W")
+            p = data[3].data.split(" ");
+            var longitude = parseFloat(p[0]) + (parseFloat(p[1]) / 60) + (parseFloat(p[2]) / 3600);
+            if (data[2].data == "W")
                 longitude = -longitude;
             $('#map').show();
             var mapCanvas = document.getElementById('map');
@@ -46,7 +47,21 @@ function get_info(src) {
     var id = parse[parse.length - 1];
     id = "/Upload/GetImageInfo/" + id;
     $.get(id, function (data) {
-        $("#viewinfo").html(data);
+        var textTohtml = "";
+        for (var i = 0; i < data.length; i++)
+        {
+            if (data[i].data)
+            {
+                textTohtml += "<p>" + data[i].parameter + " ";
+                textTohtml += data[i].data + "</p>";
+            }
+            else
+            {
+                textTohtml += "<h2>" + data[i].parameter + "</h2>";
+            }
+
+        }
+        $("#viewinfo").html(textTohtml);
     });
     $("#exifhead").show();
 }
@@ -61,7 +76,11 @@ function get_userdescription(src) {
     var parse = src.split('/');
     var id = parse[parse.length - 1];
     $.post("Upload/GetSetComments", { Id: id, Text: null }, function (data) {
-        $("#userdescription").html(data);
+        var textTohtml = "<li class=\"editable\" data-value=\"";
+        for (var i = 0; i < data.length; i++) {
+            textTohtml += data[i].parameter + "\">" + data[i].data + "</li>";
+        }
+        $("#userdescription").html(textTohtml);
         replaceText();
     });
     $("#userdescrhead").show();

@@ -1,6 +1,6 @@
 ﻿namespace ImagesHosting.Models
 {
-    public class Image_base 
+    public class ImageBase 
     {
         public int Id { get; set; }
         public string url { get; set; }
@@ -9,5 +9,11 @@
         public string change_date { get; set; }
         public string imgtype { get; set; }
      
+    }
+
+    public class JSONDataFormat
+    {
+        public string parameter { get; set; }
+        public string data { get; set; }
     }
 }

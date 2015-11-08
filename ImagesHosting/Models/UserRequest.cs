@@ -1,6 +1,6 @@
 ﻿namespace ImagesHosting.Models
 {
-    public class user_request
+    public class UserRequest
     {
         public string Id { get; set; }
         public string Text { get; set; }

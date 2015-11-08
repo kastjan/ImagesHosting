@@ -13,7 +13,7 @@ namespace ImagesHosting.Controllers
         public ActionResult Index()
         {
             
-            using (Image_context db = new Image_context())
+            using (ImageContext db = new ImageContext())
             {
                 IEnumerable<int> guids = db.Images.Select(img => img.Id).ToList();
                 return View(guids);
