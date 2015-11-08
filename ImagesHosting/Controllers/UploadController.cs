@@ -1,9 +1,6 @@
 ﻿using ImagesHosting.Models;
-using ExifLib;
 using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Mvc;
@@ -14,221 +11,134 @@ namespace ImagesHosting.Controllers
 {
     public class UploadController : Controller
     {
-        //
-        // GET: /Upload/
         string ServerPath = new DirectoryInfo(HostingEnvironment.ApplicationPhysicalPath).Parent.FullName;
         public ActionResult UploadImage(HttpPostedFileBase[] files)
         {
-            if (files[0]!=null)
+            try
             {
-                foreach (var file in files)
+                if (files[0] != null)
                 {
-                    using (ImageContext db = new ImageContext())
+                    foreach (var file in files)
                     {
-                        MemoryStream ms = new MemoryStream();
-                        file.InputStream.CopyTo(ms);
-                        ImageBase image = new ImageBase 
-                        { 
-                            url = ServerPath + "\\images\\" + file.FileName, 
-                            user_description = null,
-                            load_date = DateTime.Now.ToString(),
-                            change_date = DateTime.Now.ToString(),
-                            imgtype = file.ContentType
-                        };
-                        db.Images.Add(image);
-                        db.SaveChanges();
-                        System.IO.Directory.CreateDirectory(ServerPath + "\\images\\");
-                        string path =ServerPath + "\\images\\" + file.FileName;
-                        FileStream newfile = new FileStream(path, FileMode.Create, FileAccess.Write);
-                        ms.WriteTo(newfile);
-                        newfile.Close();
-                        Response.Write(true);
+                        var database = new AccessToDatabase();
+                        if (database.AddImage(file) != null)
+                            return View("Error");
                     }
                 }
+                return RedirectToAction("Index", "Home");
             }
-            return RedirectToAction("Index", "Home");
+            catch(Exception)
+            {
+                return View("Error");
+            }
         }
 
         public ActionResult RemoveImage(string Id)
         {
-            using (ImageContext db = new ImageContext())
+            try
             {
                 int id = Int32.Parse(Id);
-                ImageBase image = db.Images.SingleOrDefault(f => f.Id == id);
-                string url = image.url;
-                var img = new ImageBase { Id = id };
-                if (System.IO.File.Exists(url))
-                    System.IO.File.Delete(url);
-                db.Images.Attach(image);
-                db.Images.Remove(image);
-                db.SaveChanges();
+                var database = new AccessToDatabase();
+                if (database.RemoveImage(id) != null)
+                    return View("error");
+                return RedirectToAction("Index", "Home");
             }
-            return RedirectToAction("Index", "Home");
+            catch(Exception)
+            {
+                return View("error");
+            }
         }
 
-        public FileContentResult viewimage(int id)
+        public ActionResult viewimage(string Id)
         {
-            using (ImageContext db = new ImageContext())
+            try
             {
-                ImageBase img = db.Images.SingleOrDefault(f => f.Id == id);
+                int id = Int32.Parse(Id);
+                var database = new AccessToDatabase();
+                var img = database.GetImageData(id);
+                if (img == null)
+                    throw new Exception();
                 FileStream file = new FileStream(img.url, FileMode.Open, FileAccess.Read);
                 MemoryStream ms = new MemoryStream();
                 file.CopyTo(ms);
                 file.Close();
                 return File(ms.GetBuffer(), img.imgtype);
             }
+            catch (Exception)
+            {
+                return View("error");
+            }
         }
         public JsonResult GetImageGPS(string Id)
         {
-            var gps = new List<JSONDataFormat>();
-            using (ImageContext db = new ImageContext())
+            try
             {
                 int id = Int32.Parse(Id);
-                ImageBase img = db.Images.SingleOrDefault(f => f.Id == id);
-                //StringBuilder sb = new StringBuilder();
-                try
-                {
-
-                    using (var reader = new ExifReader(img.url))
-                    {
-                        object val;
-                        reader.GetTagValue(ExifTags.GPSLatitudeRef, out val);
-                        gps.Add(new JSONDataFormat {parameter = "GPSLatitudeRef", data = RenderTag(val) });
-                        reader.GetTagValue(ExifTags.GPSLatitude, out val);
-                        gps.Add(new JSONDataFormat { parameter = "GPSLatitude", data = RenderTag(val) });
-                        reader.GetTagValue(ExifTags.GPSLongitudeRef, out val);
-                        gps.Add(new JSONDataFormat { parameter = "GPSLongitudeRef", data = RenderTag(val) });
-                        reader.GetTagValue(ExifTags.GPSLongitude, out val);
-                        gps.Add(new JSONDataFormat { parameter = "GPSLongitude", data = RenderTag(val) });
-                        //Response.Write(gps);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //Response.Write(null);
-                    gps.Add(new JSONDataFormat { parameter = null, data = ex.Message.ToString()});
-                }
+                var database = new AccessToDatabase();
+                var img = database.GetImageData(id);
+                var exifdata = new GetExifData();
+                return Json(exifdata.GetGPS(img), JsonRequestBehavior.AllowGet);
             }
-            return Json(gps, JsonRequestBehavior.AllowGet);
+            catch(Exception)
+            {
+                return null;
+            }
         }
 
         public JsonResult GetImageInfo(string Id)
         {
-            using (ImageContext db = new ImageContext())
+            try
             {
                 List<JSONDataFormat> data = new List<JSONDataFormat>();
                 int id = Int32.Parse(Id);
-                ImageBase img = db.Images.SingleOrDefault(f => f.Id == id);
-                data.Add(new JSONDataFormat { parameter = "IMAGE INFO FROM DATABASE" , data = null});
+                var database = new AccessToDatabase();
+                var img = database.GetImageData(id);
+                data.Add(new JSONDataFormat { parameter = "IMAGE INFO FROM DATABASE", data = null });
                 data.Add(new JSONDataFormat { parameter = "Load Date: ", data = img.load_date });
                 data.Add(new JSONDataFormat { parameter = "Change Date: ", data = img.change_date });
-
-                //StringBuilder sb = new StringBuilder();
-                /*sb.AppendFormat("<h2>IMAGE INFO FROM DATABASE</h2>");
-                sb.AppendFormat("<p>Load Date: {0}</p>", img.load_date);
-                sb.AppendFormat("<p>Change Date: {0}</p>", img.change_date);*/
-                try
-                {
-                    using (var reader = new ExifReader(img.url))
-                    {
-                        // Parse through all available fields and generate key-value labels
-                        var props = Enum.GetValues(typeof(ExifTags)).Cast<ushort>().Select(tagID =>
-                        {
-                            object val;
-                            if (reader.GetTagValue(tagID, out val))
-                            {
-                                // Special case - some doubles are encoded as TIFF rationals. These
-                                // items can be retrieved as 2 element arrays of {numerator, denominator}
-                                if (val is double)
-                                {
-                                    int[] rational;
-                                    if (reader.GetTagValue(tagID, out rational))
-                                        val = string.Format("{0} ({1}/{2})", val, rational[0], rational[1]);
-                                }
-                                var inf = new JSONDataFormat();
-                                inf.parameter = Enum.GetName(typeof(ExifTags), tagID);
-                                inf.data = RenderTag(val);
-                                //return string.Format("<p>{0}: {1}</p>", Enum.GetName(typeof(ExifTags), tagID), RenderTag(val));
-                                return inf;
-                            }
-
-                            return null;
-
-                        }).Where(x => x != null).ToList();
-                         //var exifdata = string.Join("\r\n", props);
-                        data.Add(new JSONDataFormat { parameter = "EXIF FROM IMAGE", data = null });
-                        data.AddRange(props);
-                       /* sb.AppendFormat("<h2>EXIF FROM IMAGE</h2>");
-                        sb.AppendFormat("<p>{0}</p>", exifdata);*/
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Something didn't work!
-                    /*sb.AppendFormat("<h2>EXIF FROM IMAGE</h2>");
-                    sb.AppendFormat("<p>{0}</p>", ex.Message.ToString());*/
-                    data.Add(new JSONDataFormat { parameter = "EXIF FROM IMAGE", data = ex.Message.ToString() });
-                }
-                //Response.Write(sb.ToString());
+                var exifdata = new GetExifData();
+                data.AddRange(exifdata.GetFullEXIF(img));
                 return Json(data, JsonRequestBehavior.AllowGet);
-	            
             }
-        }
-        private static string RenderTag(object tagValue)
-        {
-            // Arrays don't render well without assistance.
-            var array = tagValue as Array;
-            if (array != null)
+	        catch (Exception)
             {
-                // Hex rendering for really big byte arrays (ugly otherwise)
-                if (array.Length > 20 && array.GetType().GetElementType() == typeof(byte))
-                    return "0x" + string.Join("", array.Cast<byte>().Select(x => x.ToString("X2")).ToArray());
-
-                return string.Join(" ", array.Cast<object>().Select(x => x.ToString()).ToArray());
-            }
-
-            return tagValue.ToString();
+                return null;
+            }   
         }
 
         [HttpPost]
         public JsonResult GetSetComments(UserRequest request)
         {
-            using (ImageContext db = new ImageContext())
+            try
             {
                 int id = Int32.Parse(request.Id);
-                ImageBase img = db.Images.SingleOrDefault(f => f.Id == id);
-                //StringBuilder sb = new StringBuilder();
+                var database = new AccessToDatabase();
+                var img = database.GetImageData(id);
+                if (img == null)
+                    throw new Exception();
                 var userdescr = new List<JSONDataFormat>();
                 if (request.Text == null)
                 {
                     if (img.user_description != null)
-                    {
-                        /*sb.AppendFormat("<li class=\"editable\" data-value=\"{0}\"> {1} </li>", id, img.user_description);
-                        Response.Write(sb.ToString());*/
-                        userdescr.Add(new JSONDataFormat { parameter = id.ToString(), data = img.user_description});
+                        userdescr.Add(new JSONDataFormat { parameter = id.ToString(), data = img.user_description });
 
-                    }
                     else
-                    {
-                        //sb.AppendFormat("<li class=\"editable\" data-value=\"{0}\"> No Comments </li>", id);
-                        //Response.Write(sb.ToString());
-                        userdescr.Add(new JSONDataFormat { parameter = id.ToString(), data = "No Comments"});
-                    }
+                        userdescr.Add(new JSONDataFormat { parameter = id.ToString(), data = "No Comments" });
                 }
                 else
                 {
                     img.user_description = request.Text;
                     img.change_date = DateTime.Now.ToString();
-                    var original = db.Images.Find(img.Id);
-                    if (original != null)
-                    {
-                        original.change_date = img.change_date;
-                        original.user_description = img.user_description;
-                        db.SaveChanges();
-                    }    
+                    if (database.ChangeImgData(img) != null)
+                        throw new Exception();
                 }
                 return Json(userdescr, JsonRequestBehavior.AllowGet);
             }
+            catch(Exception)
+            {
+                return null;
+            }
+           
         }
     }
 

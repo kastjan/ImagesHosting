@@ -11,9 +11,4 @@
      
     }
 
-    public class JSONDataFormat
-    {
-        public string parameter { get; set; }
-        public string data { get; set; }
-    }
 }
