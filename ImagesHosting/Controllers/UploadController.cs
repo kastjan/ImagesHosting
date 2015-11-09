@@ -9,6 +9,7 @@ using System.Collections.Generic;
 
 namespace ImagesHosting.Controllers
 {
+    //Send images to database
     public class UploadController : Controller
     {
         string ServerPath = new DirectoryInfo(HostingEnvironment.ApplicationPhysicalPath).Parent.FullName;
@@ -33,6 +34,7 @@ namespace ImagesHosting.Controllers
             }
         }
 
+        //Remove images from database
         public ActionResult RemoveImage(string Id)
         {
             try
@@ -49,6 +51,7 @@ namespace ImagesHosting.Controllers
             }
         }
 
+        //Get image from dadabase by ID
         public ActionResult viewimage(string Id)
         {
             try
@@ -69,6 +72,7 @@ namespace ImagesHosting.Controllers
                 return View("error");
             }
         }
+        //Get image GPS coordinates from database by ID 
         public JsonResult GetImageGPS(string Id)
         {
             try
@@ -85,6 +89,7 @@ namespace ImagesHosting.Controllers
             }
         }
 
+        // Get Full image EXIF information from database by ID 
         public JsonResult GetImageInfo(string Id)
         {
             try
@@ -106,6 +111,7 @@ namespace ImagesHosting.Controllers
             }   
         }
 
+        //Get and Set user comments in database by image ID
         [HttpPost]
         public JsonResult GetSetComments(UserRequest request)
         {

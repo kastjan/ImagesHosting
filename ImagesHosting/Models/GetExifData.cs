@@ -6,11 +6,14 @@ using System.Web;
 
 namespace ImagesHosting.Models
 {
+    //Data format. Uset to form JSON AJAX answers
     public class JSONDataFormat
     {
         public string parameter { get; set; }
         public string data { get; set; }
     }
+
+    //Decode Exif information from image
     public class GetExifData
     {
         private static string RenderTag(object tagValue)
@@ -26,6 +29,7 @@ namespace ImagesHosting.Models
 
             return tagValue.ToString();
         }
+        //Send list JSON objects with full image Exif information 
         public List<JSONDataFormat> GetFullEXIF(ImageBase img)
         {
             List<JSONDataFormat> data = new List<JSONDataFormat>();
@@ -64,6 +68,7 @@ namespace ImagesHosting.Models
             return data;
         }
 
+        //Send list JSON objects with image GPS coordinats  
         public List<JSONDataFormat> GetGPS(ImageBase img)
         {
             var gps = new List<JSONDataFormat>();

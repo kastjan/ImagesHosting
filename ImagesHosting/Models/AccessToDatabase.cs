@@ -7,26 +7,29 @@ using System.Web.Hosting;
 
 namespace ImagesHosting.Models
 {
+    //class implements methods to work with database
     public class AccessToDatabase
     {
         private string ServerPath = new DirectoryInfo(HostingEnvironment.ApplicationPhysicalPath).Parent.FullName;
+
+        //Add image to database. Return null if success
         public string AddImage(HttpPostedFileBase file)
         {
             try
             {
+                string path = String.Format("{0}\\images\\{1}", ServerPath, file.FileName);
                 ImageContext db = new ImageContext();
                 MemoryStream ms = new MemoryStream();
                 file.InputStream.CopyTo(ms);
                 ImageBase image = new ImageBase
                 {
-                    url = ServerPath + "\\images\\" + file.FileName,
+                    url = path,
                     user_description = null,
                     load_date = DateTime.Now.ToString(),
                     change_date = DateTime.Now.ToString(),
                     imgtype = file.ContentType
                 };
                 System.IO.Directory.CreateDirectory(ServerPath + "\\images\\");
-                string path = ServerPath + "\\images\\" + file.FileName;
                 FileStream newfile = new FileStream(path, FileMode.Create, FileAccess.Write);
                 ms.WriteTo(newfile);
                 newfile.Close();
@@ -39,6 +42,8 @@ namespace ImagesHosting.Models
                 return ex.ToString();
             }
         }
+
+        //Remove image from database by id
         public string RemoveImage(int id)
         {
             try
@@ -59,6 +64,8 @@ namespace ImagesHosting.Models
                 return ex.ToString();
             }
         }
+
+        //Send image information from database by id
         public ImageBase GetImageData(int id)
         {
             try
@@ -74,6 +81,7 @@ namespace ImagesHosting.Models
                 return null;
             }
         }
+        //Edit information in database
         public string ChangeImgData(ImageBase img)
         {
             try
