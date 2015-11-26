@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -10,14 +11,14 @@ namespace ImagesHosting.Models
     //class implements methods to work with database
     public class AccessToDatabase
     {
-        private string ServerPath = new DirectoryInfo(HostingEnvironment.ApplicationPhysicalPath).Parent.FullName;
+        private string ServerPath = ConfigurationManager.AppSettings["StoredImages"];
 
         //Add image to database. Return null if success
         public string AddImage(HttpPostedFileBase file)
         {
             try
             {
-                string path = String.Format("{0}\\images\\{1}", ServerPath, file.FileName);
+                string path = String.Format("{0}\\{1}", ServerPath, file.FileName);
                 ImageContext db = new ImageContext();
                 MemoryStream ms = new MemoryStream();
                 file.InputStream.CopyTo(ms);
@@ -29,7 +30,7 @@ namespace ImagesHosting.Models
                     change_date = DateTime.Now.ToString(),
                     imgtype = file.ContentType
                 };
-                System.IO.Directory.CreateDirectory(ServerPath + "\\images\\");
+                System.IO.Directory.CreateDirectory(ServerPath);
                 FileStream newfile = new FileStream(path, FileMode.Create, FileAccess.Write);
                 ms.WriteTo(newfile);
                 newfile.Close();
