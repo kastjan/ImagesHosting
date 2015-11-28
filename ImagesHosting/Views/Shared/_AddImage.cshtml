@@ -1,0 +1,21 @@
+﻿<div class="row">
+    <div class="col-lg-12 col-md-12">
+        <div class="row">
+            <div class="col-lg-9 col-md-9">
+                @using (Html.BeginForm("UploadImage", "Upload", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    <div class="row">
+                        <div class="col-lg-9 col-md-9">
+                            <input type="file" multiple="multiple" name="files" id="files" class="form-control" />
+                        </div>
+                        <div class="col-lg-3 col-md-3">
+                            <input type="submit" value="Загрузить" class="form-control" />
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="col-lg-3 col-md-3">
+                <input type="submit" value="Удалить" class="form-control" onclick="removeimage()" />
+            </div>
+        </div>
+    </div>

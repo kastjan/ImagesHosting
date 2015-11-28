@@ -178,6 +178,7 @@
     <Content Include="assets\js\bootstrap-3.3.2-dist\js\bootstrap.js" />
     <Content Include="assets\js\bootstrap-3.3.2-dist\js\bootstrap.min.js" />
     <Content Include="assets\js\bootstrap-3.3.2-dist\js\npm.js" />
+    <Content Include="assets\js\modernizr-2.8.3.js" />
     <Content Include="assets\js\pagescripts.js" />
     <Content Include="assets\js\libs\google.js" />
     <Content Include="assets\js\replacetext.js" />
@@ -186,25 +187,13 @@
     <Content Include="assets\js\libs\jquery.secret-source.min.js" />
     <Content Include="assets\replacetext.css" />
     <Content Include="assets\Style.css" />
-    <Content Include="Content\bootstrap-theme.css" />
-    <Content Include="Content\bootstrap-theme.min.css" />
-    <Content Include="Content\bootstrap.css" />
-    <Content Include="Content\bootstrap.min.css" />
-    <Content Include="Content\Site.css" />
+    <Content Include="assets\Site.css" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="Content\bootstrap.css.map" />
-    <Content Include="Content\bootstrap-theme.css.map" />
-    <None Include="Scripts\jquery-2.1.4.intellisense.js" />
-    <Content Include="Scripts\bootstrap.js" />
-    <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="Scripts\jquery-2.1.4.js" />
-    <Content Include="Scripts\jquery-2.1.4.min.js" />
-    <Content Include="Scripts\modernizr-2.8.3.js" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -216,6 +205,8 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
     <Content Include="Views\Web.config" />
+    <Content Include="Views\Shared\_AddImage.cshtml" />
+    <Content Include="Views\Shared\_ShowImage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -245,9 +236,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Upload\error.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Scripts\jquery-2.1.4.min.map" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201511072140142_InitialCreate.resx">
